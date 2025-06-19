@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluxo Real - Gestão Financeira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #0f0f13;
+            --color-bg-secondary: rgba(255, 255, 255, 0.05);
+            --color-bg-card: rgba(255, 255, 255, 0.08);
+            --color-text: #f0f0f0;
+            --color-text-secondary: rgba(255, 255, 255, 0.7);
+            --color-primary: #d4af37;
+            --color-primary-light: #f5df73;
+            --color-error: #ff4d4f;
+            --color-success: #52c41a;
+            --color-warning: #faad14;
+            --border-radius: 12px;
+            --header-height: 70px;
+            --sidebar-width: 280px;
+            --bottom-nav-height: 60px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        header {
+            height: var(--header-height);
+            background: rgba(15, 15, 19, 0.9);
+            backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--color-primary);
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand .material-icons {
+            font-size: 1.8rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--color-text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        /* Layout Principal */
+        #app-container {
+            display: flex;
+            flex: 1;
+            padding-bottom: var(--bottom-nav-height);
+        }
+
+        /* Sidebar */
+        aside.sidebar {
+            width: var(--sidebar-width);
+            background: rgba(15, 15, 19, 0.9);
+            backdrop-filter: blur(16px);
+            padding: 24px 16px;
+            display: none;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        aside.sidebar.open {
+            display: flex;
+        }
+
+        .nav-menu {
+            list-style: none;
+            margin-top: 24px;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 20px;
+            color: var(--color-text);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .nav-link.active {
+            background: var(--color-primary);
+            color: #000;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+        }
+
+        .nav-link:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link .icon {
+            font-size: 1.5rem;
+        }
+
+        /* Conteúdo Principal */
+        main {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 1rem;
+            max-width: 700px;
+        }
+
+        .card {
+            background: var(--color-bg-card);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .material-icons {
+            font-size: 1.5rem;
+        }
+
+        /* Formulário */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--color-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: var(--border-radius);
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-text);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--color-primary);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 20px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: var(--border-radius);
+            border: none;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        /* Lista de Orçamentos */
+        .budget-list {
+            margin-top: 32px;
+        }
+
+        .budget-item {
+            background: var(--color-bg-card);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .budget-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .budget-info {
+            flex: 1;
+        }
+
+        .budget-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .budget-meta {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            gap: 16px;
+        }
+
+        .budget-amount {
+            color: var(--color-primary);
+            font-weight: 500;
+        }
+
+        .budget-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .budget-actions .icon-btn {
+            color: var(--color-text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .budget-actions .icon-btn:hover {
+            color: var(--color-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Guia Financeiro */
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .guide-card {
+            background: var(--color-bg-card);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .guide-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .guide-card .material-icons {
+            font-size: 2.5rem;
+            color: var(--color-primary);
+            margin-bottom: 16px;
+        }
+
+        .guide-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--color-primary);
+        }
+
+        .guide-card-content {
+            color: var(--color-text-secondary);
+            margin-bottom: 16px;
+            flex-grow: 1;
+        }
+
+        .guide-card-link {
+            color: var(--color-primary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: auto;
+        }
+
+        /* Detetive de Despesas */
+        .analysis-result {
+            margin-top: 32px;
+            display: none;
+        }
+
+        .suggestion-item {
+            background: var(--color-bg-card);
+            border-radius: var(--border-radius);
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .suggestion-item .material-icons {
+            color: var(--color-primary);
+        }
+
+        /* Desafios */
+        .challenge-item {
+            background: var(--color-bg-card);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .challenge-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .challenge-item.completed {
+            opacity: 0.7;
+            border-left: 4px solid var(--color-success);
+        }
+
+        .challenge-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .challenge-title .material-icons {
+            color: var(--color-primary);
+            font-size: 1.2rem;
+        }
+
+        .challenge-reward {
+            color: var(--color-primary);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .challenge-progress {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--color-primary);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* SOS Finanças */
+        .alert-card {
+            background: rgba(250, 173, 20, 0.1);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--color-warning);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            color: var(--color-warning);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-title .material-icons {
+            font-size: 1.5rem;
+        }
+
+        .alert-solution {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Navegação Mobile */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--bottom-nav-height);
+            background: rgba(15, 15, 19, 0.9);
+            backdrop-filter: blur(16px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 900;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+            color: var(--color-text-secondary);
+            padding: 12px;
+            border-radius: 50%;
+            transition: var(--transition);
+            display: flex;
+        }
+
+        .nav-icon.active {
+            color: var(--color-primary);
+            transform: translateY(-5px);
+        }
+
+        .nav-icon:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Tema Claro */
+        body.light-theme {
+            --color-bg: #f8f9fa;
+            --color-bg-secondary: rgba(0, 0, 0, 0.05);
+            --color-bg-card: #ffffff;
+            --color-text: #333333;
+            --color-text-secondary: #666666;
+            --color-primary: #d4af37;
+            --color-primary-light: #f5df73;
+            --color-error: #ff4d4f;
+            --color-success: #52c41a;
+            --color-warning: #faad14;
+        }
+
+        body.light-theme .form-input {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+        }
+
+        body.light-theme .card,
+        body.light-theme .budget-item,
+        body.light-theme .guide-card,
+        body.light-theme .challenge-item {
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Responsividade */
+        @media (min-width: 1024px) {
+            .icon-btn#menu-toggle {
+                display: none;
+            }
+
+            aside.sidebar {
+                display: flex;
+            }
+
+            main {
+                padding: 32px 48px;
+            }
+
+            .bottom-nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1023px) {
+            aside.sidebar {
+                position: fixed;
+                top: var(--header-height);
+                left: 0;
+                height: calc(100vh - var(--header-height));
+                z-index: 999;
+            }
+
+            main {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .guide-grid {
+                grid-template-columns: 1fr;
+            }
+
+            main {
+                padding: 16px;
+            }
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            padding: 16px 20px;
+            background: var(--color-bg-card);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transform: translateX(100%);
+            animation: slideIn 0.3s forwards;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .toast.success {
+            border-left-color: var(--color-success);
+        }
+
+        .toast.error {
+            border-left-color: var(--color-error);
+        }
+
+        .toast.warning {
+            border-left-color: var(--color-warning);
+        }
+
+        .toast .material-icons {
+            font-size: 1.8rem;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Verificação de Autenticação -->
+    <script>
+        if (!localStorage.getItem('authToken')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <!-- Header -->
+    <header>
+        <button class="icon-btn" id="menu-toggle" aria-label="Abrir menu">
+            <span class="material-icons">menu</span>
+        </button>
+        <div class="brand">
+            <span class="material-icons">account_balance_wallet</span>
+            FLUXO REAL
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" id="theme-toggle" aria-label="Alternar tema">
+                <span class="material-icons">brightness_6</span>
+            </button>
+            <button class="icon-btn" id="logout-btn" aria-label="Sair">
+                <span class="material-icons">logout</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Container Principal -->
+    <div id="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#budget" class="nav-link active" data-view="budget">
+                            <span class="material-icons icon">attach_money</span>
+                            <span>Orçamento Mágico</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#expenses" class="nav-link" data-view="expenses">
+                            <span class="material-icons icon">search</span>
+                            <span>Detetive de Despesas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#challenges" class="nav-link" data-view="challenges">
+                            <span class="material-icons icon">emoji_events</span>
+                            <span>Desafio da Grana</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#guide" class="nav-link" data-view="guide">
+                            <span class="material-icons icon">menu_book</span>
+                            <span>Guia Financeiro</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#sos" class="nav-link" data-view="sos">
+                            <span class="material-icons icon">warning</span>
+                            <span>SOS Finanças</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main>
+            <!-- View de Orçamento -->
+            <section id="budget-view" class="view fade-in active">
+                <div class="section-header">
+                    <h1 class="section-title">Orçamento Mágico</h1>
+                    <p class="section-subtitle">Crie um orçamento que se adapta automaticamente aos seus hábitos de consumo, sugerindo metas realistas e alcançáveis.</p>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">
+                        <span class="material-icons">add_circle</span>
+                        Criar Novo Orçamento
+                    </h2>
+                    <form id="budget-form">
+                        <div class="form-group">
+                            <label for="budget-name" class="form-label">Nome do Orçamento</label>
+                            <input type="text" id="budget-name" class="form-input" required placeholder="Ex: Alimentação Mensal">
+                        </div>
+                        <div class="form-group">
+                            <label for="budget-amount" class="form-label">Valor Mensal (R$)</label>
+                            <input type="number" id="budget-amount" class="form-input" min="0" step="0.01" required placeholder="500,00">
+                        </div>
+                        <div class="form-group">
+                            <label for="budget-category" class="form-label">Categoria</label>
+                            <select id="budget-category" class="form-input" required>
+                                <option value="">Selecione uma categoria</option>
+                                <option value="alimentacao">Alimentação</option>
+                                <option value="moradia">Moradia</option>
+                                <option value="transporte">Transporte</option>
+                                <option value="lazer">Lazer</option>
+                                <option value="educacao">Educação</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="material-icons">add</span>
+                            Adicionar Orçamento
+                        </button>
+                    </form>
+                </div>
+
+                <div class="budget-list">
+                    <h2 class="card-title">
+                        <span class="material-icons">list_alt</span>
+                        Seus Orçamentos
+                    </h2>
+                    <div id="budgets-list">
+                        <!-- Orçamentos serão carregados aqui -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- View de Detetive de Despesas -->
+            <section id="expenses-view" class="view">
+                <div class="section-header">
+                    <h1 class="section-title">Detetive de Despesas</h1>
+                    <p class="section-subtitle">Com tecnologia de IA, analise seus gastos e descubra onde economizar, como um verdadeiro detetive financeiro!</p>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">
+                        <span class="material-icons">analytics</span>
+                        Análise de Gastos
+                    </h2>
+                    <p>Clique no botão abaixo para analisar seus gastos e receber recomendações personalizadas.</p>
+                    <button id="analyze-expenses" class="btn btn-primary">
+                        <span class="material-icons">play_arrow</span>
+                        Iniciar Análise
+                    </button>
+                </div>
+
+                <div id="expenses-analysis" class="analysis-result">
+                    <h2 class="card-title">
+                        <span class="material-icons">lightbulb</span>
+                        Sugestões de Economia
+                    </h2>
+                    <div id="suggestions-list">
+                        <!-- Sugestões serão inseridas aqui -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- View de Desafios -->
+            <section id="challenges-view" class="view">
+                <div class="section-header">
+                    <h1 class="section-title">Desafio da Grana</h1>
+                    <p class="section-subtitle">Complete desafios semanais que incentivam a economia, com recompensas e metas que tornam o controle financeiro mais divertido.</p>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">
+                        <span class="material-icons">military_tech</span>
+                        Seus Desafios
+                    </h2>
+                    <div id="challenges-list">
+                        <div class="challenge-item">
+                            <h3 class="challenge-title">
+                                <span class="material-icons">savings</span>
+                                Economize R$100 este mês
+                            </h3>
+                            <p class="challenge-reward">Recompensa: 50 pontos</p>
+                            <div class="challenge-progress">
+                                <div class="progress-bar" style="width: 30%"></div>
+                            </div>
+                            <button class="btn btn-primary start-challenge" data-id="1">
+                                <span class="material-icons">play_arrow</span>
+                                Iniciar Desafio
+                            </button>
+                        </div>
+                        <div class="challenge-item">
+                            <h3 class="challenge-title">
+                                <span class="material-icons">delivery_dining</span>
+                                Reduza gastos com delivery pela metade
+                            </h3>
+                            <p class="challenge-reward">Recompensa: 75 pontos</p>
+                            <div class="challenge-progress">
+                                <div class="progress-bar" style="width: 15%"></div>
+                            </div>
+                            <button class="btn btn-primary start-challenge" data-id="2">
+                                <span class="material-icons">play_arrow</span>
+                                Iniciar Desafio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View de Guia Financeiro -->
+            <section id="guide-view" class="view">
+                <div class="section-header">
+                    <h1 class="section-title">Guia Financeiro</h1>
+                    <p class="section-subtitle">Aprenda sobre educação financeira com nossas lições diárias e artigos especializados.</p>
+                </div>
+
+                <div class="guide-grid">
+                    <div class="guide-card">
+                        <span class="material-icons">savings</span>
+                        <h3 class="guide-card-title">Como Criar uma Reserva de Emergência</h3>
+                        <p class="guide-card-content">Aprenda a construir sua reserva financeira em 6 passos simples, mesmo começando com pouco dinheiro.</p>
+                        <a href="#" class="guide-card-link">
+                            Ler mais
+                            <span class="material-icons">arrow_forward</span>
+                        </a>
+                    </div>
+                    <div class="guide-card">
+                        <span class="material-icons">trending_up</span>
+                        <h3 class="guide-card-title">Investimentos para Iniciantes</h3>
+                        <p class="guide-card-content">Descubra as melhores opções de investimento para quem está começando e como evitar erros comuns.</p>
+                        <a href="#" class="guide-card-link">
+                            Ler mais
+                            <span class="material-icons">arrow_forward</span>
+                        </a>
+                    </div>
+                    <div class="guide-card">
+                        <span class="material-icons">credit_card</span>
+                        <h3 class="guide-card-title">Como Usar o Cartão de Crédito com Sabedoria</h3>
+                        <p class="guide-card-content">Estratégias para aproveitar os benefícios do cartão sem cair em dívidas e armadilhas financeiras.</p>
+                        <a href="#" class="guide-card-link">
+                            Ler mais
+                            <span class="material-icons">arrow_forward</span>
+                        </a>
+                    </div>
+                    <div class="guide-card">
+                        <span class="material-icons">pie_chart</span>
+                        <h3 class="guide-card-title">Orçamento 50-30-20</h3>
+                        <p class="guide-card-content">O método simples e eficaz para distribuir sua renda entre necessidades, desejos e investimentos.</p>
+                        <a href="#" class="guide-card-link">
+                            Ler mais
+                            <span class="material-icons">arrow_forward</span>
+                        </a>
+                    </div>
+                    <div class="guide-card">
+                        <span class="material-icons">psychology</span>
+                        <h3 class="guide-card-title">Psicologia Financeira</h3>
+                        <p class="guide-card-content">Entenda como suas emoções influenciam suas decisões financeiras e como desenvolver hábitos saudáveis.</p>
+                        <a href="#" class="guide-card-link">
+                            Ler mais
+                            <span class="material-icons">arrow_forward</span>
+                        </a>
+                    </div>
+                    <div class="guide-card">
+                        <span class="material-icons">school</span>
+                        <h3 class="guide-card-title">Dica do Dia</h3>
+                        <p class="guide-card-content" id="daily-tip">Sempre reserve 20% da sua renda para investimentos. Comece com qualquer valor e aumente gradualmente.</p>
+                        <a href="#" class="guide-card-link">
+                            Ver mais dicas
+                            <span class="material-icons">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View de SOS Finanças -->
+            <section id="sos-view" class="view">
+                <div class="section-header">
+                    <h1 class="section-title">SOS Finanças</h1>
+                    <p class="section-subtitle">Em situações emergenciais – como gastos inesperados ou risco de endividamento – encontre aqui orientações para agir rápido.</p>
+                </div>
+
+                <div id="emergency-alerts">
+                    <div class="alert-card">
+                        <h3 class="alert-title">
+                            <span class="material-icons">warning</span>
+                            Gasto excessivo detectado!
+                        </h3>
+                        <p>Você ultrapassou 80% do seu orçamento em Alimentação neste mês. Recomendamos revisar seus gastos nas próximas semanas.</p>
+                        <div class="alert-solution">
+                            <h4>Solução Recomendada:</h4>
+                            <ul>
+                                <li>Planeje suas refeições com antecedência</li>
+                                <li>Prefira compras no mercado a delivery</li>
+                                <li>Estabeleça um limite diário para gastos com alimentação</li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-primary">
+                            <span class="material-icons">check</span>
+                            Entendi, vou me organizar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">
+                        <span class="material-icons">contact_support</span>
+                        Precisa de Ajuda Imediata?
+                    </h2>
+                    <p>Se você está enfrentando dificuldades financeiras graves, entre em contato com nossos especialistas:</p>
+                    <div style="margin-top: 20px; display: flex; gap: 16px;">
+                        <button class="btn btn-primary">
+                            <span class="material-icons">chat</span>
+                            Chat Online
+                        </button>
+                        <button class="btn btn-secondary">
+                            <span class="material-icons">call</span>
+                            Ligar para Especialista
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Navegação Mobile -->
+    <nav class="bottom-nav">
+        <a href="#budget" class="nav-icon active" data-view="budget" aria-label="Orçamento">
+            <span class="material-icons">attach_money</span>
+        </a>
+        <a href="#expenses" class="nav-icon" data-view="expenses" aria-label="Despesas">
+            <span class="material-icons">search</span>
+        </a>
+        <a href="#challenges" class="nav-icon" data-view="challenges" aria-label="Desafios">
+            <span class="material-icons">emoji_events</span>
+        </a>
+        <a href="#guide" class="nav-icon" data-view="guide" aria-label="Guia">
+            <span class="material-icons">menu_book</span>
+        </a>
+        <a href="#sos" class="nav-icon" data-view="sos" aria-label="SOS">
+            <span class="material-icons">warning</span>
+        </a>
+    </nav>
+
+    <!-- Notificações Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // =========== INICIALIZAÇÃO ===========
+        document.addEventListener('DOMContentLoaded', function () {
+            // Verificar autenticação
+            if (!localStorage.getItem('authToken')) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // =========== VARIÁVEIS GLOBAIS ===========
+            const DOM = {
+                menuToggle: document.getElementById('menu-toggle'),
+                themeToggle: document.getElementById('theme-toggle'),
+                logoutBtn: document.getElementById('logout-btn'),
+                sidebar: document.getElementById('sidebar'),
+                budgetForm: document.getElementById('budget-form'),
+                budgetsList: document.getElementById('budgets-list'),
+                analyzeBtn: document.getElementById('analyze-expenses'),
+                views: {
+                    budget: document.getElementById('budget-view'),
+                    expenses: document.getElementById('expenses-view'),
+                    challenges: document.getElementById('challenges-view'),
+                    guide: document.getElementById('guide-view'),
+                    sos: document.getElementById('sos-view')
+                },
+                navLinks: document.querySelectorAll('.nav-link, .nav-icon')
+            };
+
+            let budgets = JSON.parse(localStorage.getItem('budgets')) || [];
+            let challenges = [
+                { id: 1, title: "Economize R$100 este mês", points: 50, completed: false },
+                { id: 2, title: "Reduza gastos com delivery pela metade", points: 75, completed: false }
+            ];
+
+            // =========== GERENCIAMENTO DE TEMA ===========
+            function applyTheme() {
+                const isLight = localStorage.getItem('theme') === 'light';
+                document.body.classList.toggle('light-theme', isLight);
+                DOM.themeToggle.innerHTML = `
+                    <span class="material-icons">${isLight ? 'brightness_4' : 'brightness_6'}</span>
+                `;
+            }
+
+            DOM.themeToggle.addEventListener('click', () => {
+                const isLight = !document.body.classList.contains('light-theme');
+                document.body.classList.toggle('light-theme');
+                localStorage.setItem('theme', isLight ? 'light' : 'dark');
+                applyTheme();
+                showToast(`Tema ${isLight ? 'claro' : 'escuro'} ativado`, 'success');
+            });
+
+            // =========== CONTROLE DE MENU ===========
+            DOM.menuToggle.addEventListener('click', () => {
+                const isOpen = DOM.sidebar.classList.toggle('open');
+                DOM.menuToggle.setAttribute('aria-expanded', isOpen);
+            });
+
+            // Fechar menu ao clicar fora (mobile)
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth < 1024 &&
+                    !DOM.menuToggle.contains(e.target) &&
+                    !DOM.sidebar.contains(e.target)) {
+                    DOM.sidebar.classList.remove('open');
+                    DOM.menuToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            // =========== NAVEGAÇÃO ENTRE VIEWS ===========
+            DOM.navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const viewId = this.getAttribute('data-view');
+
+                    // Atualizar navegação ativa
+                    DOM.navLinks.forEach(el => el.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Alternar views
+                    Object.values(DOM.views).forEach(view => {
+                        view.classList.remove('active');
+                    });
+                    DOM.views[viewId].classList.add('active', 'fade-in');
+
+                    // Fechar sidebar em dispositivos móveis
+                    if (window.innerWidth < 1024) {
+                        DOM.sidebar.classList.remove('open');
+                        DOM.menuToggle.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            });
+
+            // =========== ORÇAMENTOS ===========
+            function renderBudgets() {
+                DOM.budgetsList.innerHTML = budgets.length > 0
+                    ? budgets.map((budget, index) => `
+                        <div class="budget-item fade-in">
+                            <div class="budget-info">
+                                <div class="budget-name">${budget.name}</div>
+                                <div class="budget-meta">
+                                    <span class="budget-amount">R$ ${budget.amount.toFixed(2)}</span>
+                                    <span>• ${budget.category}</span>
+                                </div>
+                            </div>
+                            <div class="budget-actions">
+                                <button class="icon-btn edit-budget" data-index="${index}" aria-label="Editar orçamento">
+                                    <span class="material-icons">edit</span>
+                                </button>
+                                <button class="icon-btn delete-budget" data-index="${index}" aria-label="Excluir orçamento">
+                                    <span class="material-icons">delete</span>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')
+                    : `<div class="card" style="text-align: center;">
+                        <p style="color: var(--color-text-secondary); margin-bottom: 16px;">
+                            Você ainda não tem orçamentos cadastrados
+                        </p>
+                        <button class="btn btn-primary" onclick="document.getElementById('budget-form').scrollIntoView({behavior: 'smooth'})">
+                            <span class="material-icons">add</span>
+                            Criar Primeiro Orçamento
+                        </button>
+                    </div>`;
+
+                // Adicionar eventos de exclusão
+                document.querySelectorAll('.delete-budget').forEach(btn => {
+                    btn.addEventListener('click', deleteBudget);
+                });
+
+                // Adicionar eventos de edição
+                document.querySelectorAll('.edit-budget').forEach(btn => {
+                    btn.addEventListener('click', editBudget);
+                });
+            }
+
+            function deleteBudget(e) {
+                const index = e.currentTarget.getAttribute('data-index');
+                if (confirm(`Tem certeza que deseja excluir o orçamento "${budgets[index].name}"?`)) {
+                    budgets.splice(index, 1);
+                    localStorage.setItem('budgets', JSON.stringify(budgets));
+                    renderBudgets();
+                    showToast('Orçamento removido com sucesso!', 'success');
+                }
+            }
+
+            function editBudget(e) {
+                const index = e.currentTarget.getAttribute('data-index');
+                const budget = budgets[index];
+                
+                // Preencher formulário com dados existentes
+                document.getElementById('budget-name').value = budget.name;
+                document.getElementById('budget-amount').value = budget.amount;
+                document.getElementById('budget-category').value = budget.category;
+                
+                // Remover o orçamento da lista
+                budgets.splice(index, 1);
+                localStorage.setItem('budgets', JSON.stringify(budgets));
+                renderBudgets();
+                
+                // Rolagem suave para o formulário
+                document.getElementById('budget-form').scrollIntoView({behavior: 'smooth'});
+                showToast('Preencha o formulário para editar o orçamento', 'info');
+            }
+
+            DOM.budgetForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const budgetName = this['budget-name'].value.trim();
+                const budgetAmount = parseFloat(this['budget-amount'].value);
+                const budgetCategory = this['budget-category'].value;
+
+                if (!budgetName || isNaN(budgetAmount) || budgetAmount <= 0 || !budgetCategory) {
+                    showToast('Por favor, preencha todos os campos corretamente!', 'error');
+                    return;
+                }
+
+                const newBudget = {
+                    name: budgetName,
+                    amount: budgetAmount,
+                    category: budgetCategory,
+                    createdAt: new Date().toISOString()
+                };
+
+                budgets.push(newBudget);
+                localStorage.setItem('budgets', JSON.stringify(budgets));
+
+                this.reset();
+                renderBudgets();
+                showToast('Orçamento adicionado com sucesso!', 'success');
+            });
+
+            // =========== DETETIVE DE DESPESAS ===========
+            DOM.analyzeBtn.addEventListener('click', function () {
+                if (budgets.length === 0) {
+                    showToast('Adicione orçamentos primeiro para realizar a análise', 'error');
+                    return;
+                }
+
+                // Simular análise de IA
+                const suggestions = [
+                    "Reduza gastos com delivery em 30% - Você gastou R$ 320 no último mês",
+                    "Cancele 1 assinatura não utilizada - Identificamos 2 serviços pouco usados",
+                    "Compre marcas genéricas no supermercado - Economia estimada de 15-20%",
+                    "Negocie tarifas bancárias - Você pode economizar até R$ 25/mês"
+                ];
+
+                const suggestionsList = document.getElementById('suggestions-list');
+                suggestionsList.innerHTML = suggestions.map(suggestion => `
+                    <div class="suggestion-item">
+                        <span class="material-icons">lightbulb</span>
+                        <div>${suggestion}</div>
+                    </div>
+                `).join('');
+
+                document.getElementById('expenses-analysis').style.display = 'block';
+                showToast('Análise concluída! Veja as sugestões abaixo', 'success');
+            });
+
+            // =========== DESAFIOS ===========
+            document.querySelectorAll('.start-challenge').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const challengeId = parseInt(this.getAttribute('data-id'));
+                    const challenge = challenges.find(c => c.id === challengeId);
+
+                    if (challenge && !challenge.completed) {
+                        challenge.completed = true;
+                        this.innerHTML = `
+                            <span class="material-icons">check</span>
+                            Desafio Iniciado
+                        `;
+                        this.disabled = true;
+                        
+                        // Atualizar barra de progresso
+                        const progressBar = this.closest('.challenge-item').querySelector('.progress-bar');
+                        progressBar.style.width = '100%';
+                        
+                        showToast(`Desafio "${challenge.title}" iniciado! Acompanhe seu progresso.`, 'success');
+                    }
+                });
+            });
+
+            // =========== SOS FINANÇAS ===========
+            function checkForAlerts() {
+                // Simular alerta de emergência após 5 segundos
+                setTimeout(() => {
+                    showToast('Alerta: Você está gastando muito com delivery!', 'warning');
+                }, 5000);
+            }
+
+            // =========== NOTIFICAÇÕES TOAST ===========
+            function showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                
+                let icon = 'info';
+                if (type === 'success') icon = 'check_circle';
+                if (type === 'error') icon = 'error';
+                if (type === 'warning') icon = 'warning';
+                
+                toast.innerHTML = `
+                    <span class="material-icons">${icon}</span>
+                    <div>${message}</div>
+                `;
+
+                const container = document.getElementById('toast-container');
+                container.appendChild(toast);
+
+                // Remover toast após 5 segundos
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 5000);
+            }
+
+            // =========== LOGOUT ===========
+            DOM.logoutBtn.addEventListener('click', () => {
+                if (confirm('Tem certeza que deseja sair da sua conta?')) {
+                    localStorage.removeItem('authToken');
+                    window.location.href = 'login.html';
+                }
+            });
+
+            // =========== INICIALIZAÇÃO ===========
+            applyTheme();
+            renderBudgets();
+            checkForAlerts();
+            
+            // Verificar se há hash na URL para navegação inicial
+            if (window.location.hash) {
+                const viewId = window.location.hash.substring(1);
+                if (DOM.views[viewId]) {
+                    DOM.navLinks.forEach(el => el.classList.remove('active'));
+                    document.querySelector(`[data-view="${viewId}"]`).classList.add('active');
+                    
+                    Object.values(DOM.views).forEach(view => {
+                        view.classList.remove('active');
+                    });
+                    DOM.views[viewId].classList.add('active', 'fade-in');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
